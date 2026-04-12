@@ -1,0 +1,22 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "resort_id": "verbier",
+    "source": "illustrative_demo",
+    "note": "Replace with OSM-derived geometry for production"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "kind": "piste", "difficulty": "red", "name": "Demo red" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [7.21, 46.08],
+          [7.22, 46.09],
+          [7.23, 46.1]
+        ]
+      }
+    }
+  ]
+}

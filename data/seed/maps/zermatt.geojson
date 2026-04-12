@@ -1,0 +1,33 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "resort_id": "zermatt",
+    "source": "illustrative_demo",
+    "note": "Replace with OSM-derived geometry for production"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "kind": "piste", "difficulty": "black", "name": "Demo black" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [7.74, 46.01],
+          [7.745, 46.015],
+          [7.752, 46.018]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "lift", "name": "Demo gondola" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [7.738, 46.008],
+          [7.755, 46.02]
+        ]
+      }
+    }
+  ]
+}

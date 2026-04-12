@@ -1,0 +1,33 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "resort_id": "chamonix",
+    "source": "illustrative_demo",
+    "note": "Replace with OSM-derived geometry for production"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "kind": "piste", "difficulty": "blue", "name": "Demo blue" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [6.865, 45.918],
+          [6.868, 45.922],
+          [6.872, 45.926]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "lift", "name": "Demo lift" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [6.866, 45.919],
+          [6.871, 45.928]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+openapi: 3.1.0
+info:
+  title: skiMate API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /resorts:
+    get:
+      summary: List ski areas
+      responses:
+        "200":
+          description: Array of SkiArea
+  /resorts/{resort_id}:
+    get:
+      summary: Get ski area
+      parameters:
+        - name: resort_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: SkiArea
+        "404":
+          description: Not found
+  /resorts/{resort_id}/map:
+    get:
+      summary: GeoJSON FeatureCollection for resort
+      parameters:
+        - name: resort_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: FeatureCollection
+  /flights/search:
+    post:
+      summary: Search and rank flights (Amadeus optional)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [origin_iata, destination_iata, departure_date]
+              properties:
+                origin_iata:
+                  type: string
+                  minLength: 3
+                  maxLength: 3
+                destination_iata:
+                  type: string
+                  minLength: 3
+                  maxLength: 3
+                departure_date:
+                  type: string
+                  format: date
+                adults:
+                  type: integer
+                  minimum: 1
+                max_stops:
+                  type: integer
+                budget_eur:
+                  type: number
+                prefer:
+                  type: string
+                  enum: [cheapest, fastest, balanced]
+      responses:
+        "200":
+          description: Ranked offers and deep link
