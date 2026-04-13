@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
 from ..database import get_db
-from ..db_models import ResortRow
+from ..db_models import Lift, ResortRow, Trail
 from ..models import GeoJSONFeatureCollection, SkiArea
 from ..seed import load_map_geojson
 
@@ -53,3 +53,40 @@ async def get_resort_map(resort_id: str, db: DbDep) -> GeoJSONFeatureCollection:
     features = data.get("features", [])
     meta = data.get("metadata") or {"resort_id": resort_id}
     return GeoJSONFeatureCollection(features=features, metadata=meta)
+
+
+@router.get("/{resort_id}/trails")
+async def get_resort_trails(resort_id: str, db: DbDep) -> dict:
+    row = await db.get(ResortRow, resort_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Resort not found")
+
+    trail_result = await db.execute(
+        select(Trail).where(Trail.resort_id == resort_id)
+    )
+    lift_result = await db.execute(
+        select(Lift).where(Lift.resort_id == resort_id)
+    )
+    trails = trail_result.scalars().all()
+    lifts = lift_result.scalars().all()
+
+    def trail_to_dict(t: Trail) -> dict:
+        return {
+            "id": t.id, "name": t.name,
+            "piste_type": t.piste_type, "piste_difficulty": t.piste_difficulty,
+            "grooming": t.grooming, "oneway": t.oneway,
+        }
+
+    def lift_to_dict(l: Lift) -> dict:
+        return {
+            "id": l.id, "name": l.name,
+            "aerialway_type": l.aerialway_type, "capacity": l.capacity,
+        }
+
+    return {
+        "resort_id": resort_id,
+        "trails": [trail_to_dict(t) for t in trails],
+        "lifts": [lift_to_dict(l) for l in lifts],
+        "total_trails": len(trails),
+        "total_lifts": len(lifts),
+    }

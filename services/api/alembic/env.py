@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 # Import our models so Alembic sees them
-from skiplanner_api.db_models import ResortRow  # noqa: F401
+from skiplanner_api.db_models import Lift, ResortRow, Trail  # noqa: F401
 from skiplanner_api.database import Base
 from skiplanner_api.config import settings
 
