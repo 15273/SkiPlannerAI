@@ -1,13 +1,25 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
 from .routers import flights, resorts
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Auto-seed in development
+    from .db_seed import seed
+    await seed()
+    yield
+
+
 app = FastAPI(
     title="skiMate API",
     version="0.1.0",
     description="skiMate MVP: resorts, map GeoJSON, flight search (Amadeus optional).",
+    lifespan=lifespan,
 )
 
 app.add_middleware(

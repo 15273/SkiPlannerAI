@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     amadeus_client_id: str = ""
     amadeus_client_secret: str = ""
     amadeus_hostname: str = "test.api.amadeus.com"
+    database_url: str = "postgresql+asyncpg://mendikalish@localhost:5433/skiplanner"
 
     @property
     def seed_dir(self) -> Path:
