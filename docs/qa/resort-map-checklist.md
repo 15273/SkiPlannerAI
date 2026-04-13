@@ -4,10 +4,10 @@ Use before tagging a release candidate for the MVP map experience.
 
 ## Data
 
-- [ ] Every `id` in [data/seed/resorts.json](../../data/seed/resorts.json) uses lowercase `snake_case` and matches optional map file `data/seed/maps/{id}.geojson`.
-- [ ] Centroids fall inside the country declared in `country` (spot-check on OSM or maps).
-- [ ] `nearest_airport_iata` is a valid 3-letter code where present.
-- [ ] `source` and `source_version` are set for traceability.
+- [x] Every `id` in [data/seed/resorts.json](../../data/seed/resorts.json) uses lowercase `snake_case` and matches optional map file `data/seed/maps/{id}.geojson`.
+- [x] Centroids fall inside the country declared in `country` (spot-check on OSM or maps).
+- [x] `nearest_airport_iata` is a valid 3-letter code where present.
+- [x] `source` and `source_version` are set for traceability.
 
 ## API
 
