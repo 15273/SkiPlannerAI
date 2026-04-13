@@ -27,6 +27,10 @@ export default function HomeRoute() {
     router.push({ pathname: '/resort/[id]', params: { id: resort.id } });
   };
 
+  const handleFlights = () => {
+    router.push('/flights');
+  };
+
   if (checking) {
     return (
       <View style={{ flex: 1, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center' }}>
@@ -38,7 +42,7 @@ export default function HomeRoute() {
   return (
     <>
       <Stack.Screen options={{ title: 'skiMate' }} />
-      <ResortListScreen onSelectResort={handleSelect} />
+      <ResortListScreen onSelectResort={handleSelect} onFlights={handleFlights} />
     </>
   );
 }

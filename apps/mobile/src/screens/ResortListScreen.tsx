@@ -1,18 +1,32 @@
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ResortCard } from '../components/ResortCard';
-import { Colors, Spacing, Typography } from '../constants/theme';
+import { Colors, Radius, Spacing, Typography } from '../constants/theme';
 import { useResorts } from '../hooks/useResorts';
 import type { Resort } from '../services/api';
 
-type Props = { onSelectResort: (resort: Resort) => void };
+type Props = { onSelectResort: (resort: Resort) => void; onFlights?: () => void };
 
-export function ResortListScreen({ onSelectResort }: Props) {
+export function ResortListScreen({ onSelectResort, onFlights }: Props) {
   const { resorts, loading, error } = useResorts();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>skiMate</Text>
-      <Text style={styles.subtitle}>Find your perfect ski resort</Text>
+      <View style={styles.headerRow}>
+        <View>
+          <Text style={styles.title}>skiMate</Text>
+          <Text style={styles.subtitle}>Find your perfect ski resort</Text>
+        </View>
+        {onFlights != null && (
+          <Pressable
+            style={styles.flightsBtn}
+            onPress={onFlights}
+            accessibilityRole="button"
+            accessibilityLabel="Search flights"
+          >
+            <Text style={styles.flightsBtnLabel}>Flights</Text>
+          </Pressable>
+        )}
+      </View>
 
       {loading && (
         <View style={styles.center}>
@@ -55,13 +69,28 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingHorizontal: Spacing.md,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
+  },
   title: { ...Typography.title, color: Colors.textPrimary },
   subtitle: {
     ...Typography.caption,
     color: Colors.textSecondary,
     marginTop: Spacing.xs,
-    marginBottom: Spacing.md,
   },
+  flightsBtn: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.button,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderWidth: 1.5,
+    borderColor: Colors.accent,
+    marginTop: 4,
+  },
+  flightsBtnLabel: { ...Typography.caption, color: Colors.accent, fontWeight: '600' },
   center: {
     flex: 1,
     alignItems: 'center',
