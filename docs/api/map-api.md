@@ -46,6 +46,68 @@ Returns a **GeoJSON-like** JSON object:
 - `features` follow standard GeoJSON semantics (`LineString` for pistes/lifts in MVP).
 - If no file exists at `data/seed/maps/{resort_id}.geojson`, the API returns an empty `features` array and a metadata note (see implementation).
 
+### `POST /recommendations`
+
+Returns a ranked list of ski resorts based on user preferences.  All fields
+are optional; an empty body returns all resorts ordered by airport-tiebreaker
+score.
+
+**Request body** (`application/json`)
+
+| Field | Type | Notes |
+|-------|------|--------|
+| `ski_level` | string? | `"beginner"` / `"intermediate"` / `"advanced"` / `"expert"` |
+| `preferred_countries` | string[]? | ISO 3166-1 alpha-2 codes, e.g. `["CH", "FR"]` |
+| `limit` | integer? | Max results to return (1–100, default `10`) |
+
+**Response** (`200 OK`)
+
+```json
+{
+  "results": [
+    {
+      "resort": { /* SkiArea object */ },
+      "score": 65,
+      "match_reasons": [
+        "difficulty 'advanced' suits advanced skiers",
+        "difficulty is a perfect level match",
+        "country 'CH' matches preference",
+        "served by airport GVA"
+      ]
+    }
+  ],
+  "total_evaluated": 18,
+  "warning": null
+}
+```
+
+**Scoring rules (additive)**
+
+| Rule | Points |
+|------|--------|
+| `difficulty_hint` compatible with `ski_level` | +30 |
+| `difficulty_hint` is a perfect match (hint == level) | +10 extra |
+| `country` in `preferred_countries` | +20 |
+| `nearest_airport_iata` present | +5 |
+
+Resorts whose `difficulty_hint` is *incompatible* with the requested
+`ski_level` are **excluded** from results.  Country preference boosts score
+but never excludes resorts.
+
+**Error responses**
+
+| Status | Condition |
+|--------|-----------|
+| `422` | Invalid `ski_level` value or `limit` out of range |
+
+**Example**
+
+```bash
+curl -X POST http://localhost:8000/recommendations \
+  -H "Content-Type: application/json" \
+  -d '{"ski_level": "advanced", "preferred_countries": ["CH"], "limit": 5}'
+```
+
 ## Shared OpenAPI
 
 A static snapshot lives at [packages/shared/openapi/openapi.yaml](../../packages/shared/openapi/openapi.yaml). Regenerate when routes change (or rely on live `/openapi.json`).

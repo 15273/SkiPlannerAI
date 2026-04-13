@@ -49,3 +49,52 @@ class FlightSearchResponse(BaseModel):
     deep_link_url: str
     provider: Literal["amadeus", "none"]
     warning: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Recommendation models
+# ---------------------------------------------------------------------------
+
+SkiLevel = Literal["beginner", "intermediate", "advanced", "expert"]
+
+
+class RecommendationRequest(BaseModel):
+    """Preferences submitted by the user (all fields optional)."""
+
+    ski_level: SkiLevel | None = Field(
+        None,
+        description=(
+            "User ski level. When set, resorts whose difficulty_hint is "
+            "incompatible are excluded; compatible ones receive a score bonus."
+        ),
+    )
+    preferred_countries: list[str] | None = Field(
+        None,
+        description=(
+            "ISO 3166-1 alpha-2 country codes the user is interested in "
+            "(e.g. ['CH', 'FR']).  When provided, matching resorts are "
+            "boosted but non-matching ones are *not* excluded."
+        ),
+    )
+    limit: int = Field(
+        10,
+        ge=1,
+        le=100,
+        description="Maximum number of resorts to return (default 10).",
+    )
+
+
+class ScoredResort(BaseModel):
+    """A resort with its recommendation score and a human-readable reason."""
+
+    resort: SkiArea
+    score: int = Field(..., description="Higher is better.")
+    match_reasons: list[str] = Field(default_factory=list)
+
+
+class RecommendationResponse(BaseModel):
+    """Ranked list of resorts and meta-information."""
+
+    results: list[ScoredResort]
+    total_evaluated: int
+    warning: str | None = None
