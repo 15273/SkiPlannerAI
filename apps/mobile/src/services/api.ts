@@ -3,7 +3,7 @@ import type { FeatureCollection } from 'geojson';
 
 const apiBase: string =
   (Constants.expoConfig?.extra as { apiBaseUrl?: string } | undefined)
-    ?.apiBaseUrl ?? 'http://localhost:8000';
+    ?.apiBaseUrl ?? 'http://localhost:8040';
 
 export type Resort = {
   id: string;

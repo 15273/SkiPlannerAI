@@ -58,16 +58,16 @@ environment, how to rotate them, and how a new developer gets set up.
    - Ask a team member for the **Amadeus test credentials** (they are in 1Password under
      _SkiPlannerAI / Amadeus sandbox_).
    - Create your own local PostgreSQL+PostGIS database and set `DATABASE_URL`.
-   - Set `EXPO_PUBLIC_API_BASE_URL=http://localhost:8000` for local development.
+   - Set `EXPO_PUBLIC_API_BASE_URL=http://localhost:8040` for local development.
    - Leave `MAPBOX_PUBLIC_TOKEN` and `GOOGLE_MAPS_API_KEY` blank if you are not working on
      the map features — the app degrades gracefully.
 4. Start the stack:
    ```bash
    docker compose up -d        # Postgres + PostGIS
-   cd services/api && uvicorn skiplanner_api.main:app --reload
+   cd services/api && uvicorn skiplanner_api.main:app --reload --host 0.0.0.0 --port 8040
    cd apps/mobile && npx expo start
    ```
-5. Verify: `GET http://localhost:8000/health` should return `{"status": "ok"}`.
+5. Verify: `GET http://localhost:8040/health` should return `{"status": "ok"}`.
 
 > `.env` is listed in `.gitignore`. **Never** commit it.
 

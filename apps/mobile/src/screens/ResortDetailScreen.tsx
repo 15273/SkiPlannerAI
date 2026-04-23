@@ -1,4 +1,3 @@
-import MapView, { Geojson, Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import {
   ActivityIndicator,
   ScrollView,
@@ -6,7 +5,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import type { FeatureCollection } from 'geojson';
+import { ResortMap } from '../components/ResortMap';
 import { Colors, Spacing, Typography, Radius } from '../constants/theme';
 import { useResort } from '../hooks/useResort';
 
@@ -47,13 +46,6 @@ export function ResortDetailScreen({ resortId }: Props) {
     );
   }
 
-  const region = {
-    latitude: resort.centroid_lat,
-    longitude: resort.centroid_lon,
-    latitudeDelta: 0.08,
-    longitudeDelta: 0.08,
-  };
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Header */}
@@ -74,33 +66,8 @@ export function ResortDetailScreen({ resortId }: Props) {
         )}
       </View>
 
-      {/* Map */}
       <View style={styles.mapContainer}>
-        <MapView
-          style={styles.map}
-          provider={PROVIDER_DEFAULT}
-          initialRegion={region}
-          accessibilityLabel={`Map of ${resort.name}`}
-        >
-          <Marker
-            coordinate={{ latitude: resort.centroid_lat, longitude: resort.centroid_lon }}
-            title={resort.name}
-            description={resort.country}
-          />
-          {mapData != null && mapData.features.length > 0 && (
-            <Geojson
-              geojson={mapData as FeatureCollection}
-              strokeColor={Colors.accent}
-              fillColor="rgba(56, 189, 248, 0.15)"
-              strokeWidth={2}
-            />
-          )}
-        </MapView>
-        {mapData == null && (
-          <View style={styles.mapOverlay}>
-            <Text style={styles.mapOverlayText}>Trail map not available</Text>
-          </View>
-        )}
+        <ResortMap resort={resort} mapData={mapData} />
       </View>
 
       {resort.nearest_airport_iata != null && (
@@ -142,17 +109,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     position: 'relative',
   },
-  map: { flex: 1 },
-  mapOverlay: {
-    position: 'absolute',
-    bottom: Spacing.sm,
-    left: Spacing.sm,
-    backgroundColor: 'rgba(15,23,42,0.75)',
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 4,
-    borderRadius: Radius.button,
-  },
-  mapOverlayText: { ...Typography.caption, color: Colors.textSecondary },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

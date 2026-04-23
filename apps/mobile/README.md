@@ -22,13 +22,13 @@ The app reads the API base URL from `app.json` → `expo.extra.apiBaseUrl`.
 
 | Scenario | Value |
 |----------|-------|
-| Local dev (simulator) | `http://localhost:8000` (default) |
-| Physical device on LAN | `http://192.168.1.10:8000` (use your machine's IP) |
+| Local dev (simulator) | `http://localhost:8040` (default) |
+| Physical device on LAN | `http://192.168.1.10:8040` (use your machine's IP) |
 | Staging | `https://api-staging.skimate.app` |
 
 Edit `app.json`:
 ```json
-"extra": { "apiBaseUrl": "http://YOUR_LAN_IP:8000" }
+"extra": { "apiBaseUrl": "http://YOUR_LAN_IP:8040" }
 ```
 
 ### 3. Map provider keys

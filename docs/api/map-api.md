@@ -1,6 +1,6 @@
 # Map API contract (MVP)
 
-Base URL: same host as API (e.g. `http://localhost:8000`). OpenAPI UI: `/docs`.
+Base URL: same host as API (e.g. `http://localhost:8040`). OpenAPI UI: `/docs`.
 
 ## Endpoints
 
@@ -103,7 +103,7 @@ but never excludes resorts.
 **Example**
 
 ```bash
-curl -X POST http://localhost:8000/recommendations \
+curl -X POST http://localhost:8040/recommendations \
   -H "Content-Type: application/json" \
   -d '{"ski_level": "advanced", "preferred_countries": ["CH"], "limit": 5}'
 ```

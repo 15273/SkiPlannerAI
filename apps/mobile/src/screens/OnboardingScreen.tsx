@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { DatePickerField } from '../components/DatePickerField';
 import { OptionButton } from '../components/onboarding/OptionButton';
 import { StepIndicator } from '../components/onboarding/StepIndicator';
 import { Colors, Radius, Spacing, Typography } from '../constants/theme';
@@ -29,9 +30,6 @@ type Props = { onComplete: (prefs: UserPreferences) => void };
 export function OnboardingScreen({ onComplete }: Props) {
   const [step, setStep] = useState(1);
   const [prefs, setPrefs] = useState<UserPreferences>(DEFAULT_PREFERENCES);
-  const [dateInput, setDateInput] = useState('');
-  const [dateError, setDateError] = useState<string | null>(null);
-
   const update = <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) =>
     setPrefs((p) => ({ ...p, [key]: value }));
 
@@ -43,25 +41,6 @@ export function OnboardingScreen({ onComplete }: Props) {
       case 4: return prefs.departureDateIso != null && prefs.nights != null;
       case 5: return prefs.originIata.length === 3;
       default: return false;
-    }
-  };
-
-  const handleDateInput = (text: string) => {
-    setDateInput(text);
-    setDateError(null);
-    // Expect YYYY-MM-DD
-    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
-      const d = new Date(text);
-      if (isNaN(d.getTime())) {
-        setDateError('Invalid date');
-      } else if (d < new Date()) {
-        setDateError('Date must be in the future');
-      } else {
-        update('departureDateIso', text);
-        setDateError(null);
-      }
-    } else if (text.length === 10) {
-      setDateError('Format: YYYY-MM-DD');
     }
   };
 
@@ -155,19 +134,11 @@ export function OnboardingScreen({ onComplete }: Props) {
         {step === 4 && (
           <View>
             <Text style={styles.heading}>When do you want to go?</Text>
-            <Text style={styles.sub}>Enter your preferred departure date.</Text>
-            <TextInput
-              style={[styles.input, dateError != null && styles.inputError]}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={Colors.textSecondary}
-              value={dateInput}
-              onChangeText={handleDateInput}
-              keyboardType="numbers-and-punctuation"
-              maxLength={10}
-              accessibilityLabel="Departure date"
-              accessibilityHint="Enter date in YYYY-MM-DD format"
+            <Text style={styles.sub}>Pick your preferred departure date from the calendar.</Text>
+            <DatePickerField
+              valueIso={prefs.departureDateIso}
+              onChange={(iso) => update('departureDateIso', iso)}
             />
-            {dateError != null && <Text style={styles.errorText}>{dateError}</Text>}
 
             <Text style={[styles.sub, { marginTop: Spacing.lg }]}>How many nights?</Text>
             <View style={styles.nightsRow}>
@@ -259,8 +230,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     marginBottom: Spacing.xs,
   },
-  inputError: { borderColor: Colors.error },
-  errorText: { ...Typography.caption, color: Colors.error, marginBottom: Spacing.sm },
   nightsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
   nightBtn: {
     width: 56, height: 56,

@@ -6,9 +6,11 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..config import settings
 from ..database import get_db
 from ..db_models import ResortRow
 from ..models import SkiArea
+from ..seed import load_resorts
 from ..recommendations import (
     RecommendationRequest,
     RecommendationResponse,
@@ -17,7 +19,7 @@ from ..recommendations import (
 
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 
-DbDep = Annotated[AsyncSession, Depends(get_db)]
+DbDep = Annotated[AsyncSession | None, Depends(get_db)]
 
 
 def _row_to_schema(row: ResortRow) -> SkiArea:
@@ -54,6 +56,9 @@ async def get_recommendations(
     An empty ``results`` list is returned (with a ``warning`` message) when
     no resorts survive the difficulty filter.
     """
-    result = await db.execute(select(ResortRow).order_by(ResortRow.name))
-    resorts = [_row_to_schema(r) for r in result.scalars()]
+    if db is None:
+        resorts = sorted(load_resorts(settings.seed_dir), key=lambda r: r.name)
+    else:
+        result = await db.execute(select(ResortRow).order_by(ResortRow.name))
+        resorts = [_row_to_schema(r) for r in result.scalars()]
     return rank_resorts(resorts, body)

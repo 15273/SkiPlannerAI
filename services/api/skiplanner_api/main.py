@@ -9,9 +9,10 @@ from .routers import flights, recommendations, resorts
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Auto-seed in development
-    from .db_seed import seed
-    await seed()
+    if not settings.skimate_dev_json_api:
+        from .db_seed import seed
+
+        await seed()
     yield
 
 

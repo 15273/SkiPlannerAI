@@ -16,12 +16,14 @@ class Settings(BaseSettings):
     )
 
     api_env: str = "development"
+    # Env: SKIMATE_DEV_JSON_API=1 — read resorts from data/seed JSON only (no Postgres). run_api.sh sets this.
+    skimate_dev_json_api: bool = False
     cors_origins: str = "http://localhost:8081,http://localhost:19006"
     repo_root: Path = _default_repo_root()
     amadeus_client_id: str = ""
     amadeus_client_secret: str = ""
     amadeus_hostname: str = "test.api.amadeus.com"
-    database_url: str = "postgresql+asyncpg://mendikalish@localhost:5433/skiplanner"
+    database_url: str = "postgresql+asyncpg://postgres:15273@localhost:5433/skiplanner"
 
     @property
     def seed_dir(self) -> Path:

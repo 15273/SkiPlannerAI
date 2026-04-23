@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { ResortListScreen } from '../src/screens/ResortListScreen';
 import type { Resort } from '../src/services/api';
+import type { UserPreferences } from '../src/types/preferences';
 import { Colors } from '../src/constants/theme';
 
 const PREFS_KEY = '@skimate/preferences';
@@ -27,8 +28,26 @@ export default function HomeRoute() {
     router.push({ pathname: '/resort/[id]', params: { id: resort.id } });
   };
 
-  const handleFlights = () => {
-    router.push('/flights');
+  const handleFlights = async () => {
+    try {
+      const json = await AsyncStorage.getItem(PREFS_KEY);
+      if (!json) {
+        router.push('/flights');
+        return;
+      }
+      const prefs = JSON.parse(json) as UserPreferences;
+      const q = new URLSearchParams();
+      if (prefs.departureDateIso != null && prefs.departureDateIso.length > 0) {
+        q.set('departure', prefs.departureDateIso);
+      }
+      if (prefs.originIata.length === 3) {
+        q.set('origin', prefs.originIata);
+      }
+      const qs = q.toString();
+      router.push(qs.length > 0 ? `/flights?${qs}` : '/flights');
+    } catch {
+      router.push('/flights');
+    }
   };
 
   if (checking) {
