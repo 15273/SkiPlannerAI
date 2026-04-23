@@ -4,14 +4,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .routers import flights, resorts
+from .routers import flights, recommendations, resorts
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Auto-seed in development
-    from .db_seed import seed
-    await seed()
+    if not settings.skimate_dev_json_api:
+        from .db_seed import seed
+
+        await seed()
     yield
 
 
@@ -32,6 +33,7 @@ app.add_middleware(
 
 app.include_router(resorts.router)
 app.include_router(flights.router)
+app.include_router(recommendations.router)
 
 
 @app.get("/health")

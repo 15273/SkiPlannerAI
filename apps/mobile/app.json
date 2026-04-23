@@ -23,11 +23,17 @@
       "package": "com.skimate.app"
     },
     "scheme": "skimate",
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
     "extra": {
-      "apiBaseUrl": "http://localhost:8000"
+      "apiBaseUrl": "http://localhost:8040"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-asset",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

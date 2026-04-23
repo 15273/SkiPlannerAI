@@ -8,11 +8,11 @@ from ..config import settings
 from ..database import get_db
 from ..db_models import Lift, ResortRow, Trail
 from ..models import GeoJSONFeatureCollection, SkiArea
-from ..seed import load_map_geojson
+from ..seed import load_map_geojson, load_resorts
 
 router = APIRouter(prefix="/resorts", tags=["resorts"])
 
-DbDep = Annotated[AsyncSession, Depends(get_db)]
+DbDep = Annotated[AsyncSession | None, Depends(get_db)]
 
 
 def _row_to_schema(row: ResortRow) -> SkiArea:
@@ -30,14 +30,29 @@ def _row_to_schema(row: ResortRow) -> SkiArea:
     )
 
 
+def _json_resorts() -> list[SkiArea]:
+    return sorted(load_resorts(settings.seed_dir), key=lambda r: r.name)
+
+
+def _json_resort(resort_id: str) -> SkiArea:
+    for r in _json_resorts():
+        if r.id == resort_id:
+            return r
+    raise HTTPException(status_code=404, detail="Resort not found")
+
+
 @router.get("", response_model=list[SkiArea])
 async def list_resorts(db: DbDep) -> list[SkiArea]:
+    if db is None:
+        return _json_resorts()
     result = await db.execute(select(ResortRow).order_by(ResortRow.name))
     return [_row_to_schema(r) for r in result.scalars()]
 
 
 @router.get("/{resort_id}", response_model=SkiArea)
 async def get_resort(resort_id: str, db: DbDep) -> SkiArea:
+    if db is None:
+        return _json_resort(resort_id)
     row = await db.get(ResortRow, resort_id)
     if row is None:
         raise HTTPException(status_code=404, detail="Resort not found")
@@ -46,9 +61,12 @@ async def get_resort(resort_id: str, db: DbDep) -> SkiArea:
 
 @router.get("/{resort_id}/map", response_model=GeoJSONFeatureCollection)
 async def get_resort_map(resort_id: str, db: DbDep) -> GeoJSONFeatureCollection:
-    row = await db.get(ResortRow, resort_id)
-    if row is None:
-        raise HTTPException(status_code=404, detail="Resort not found")
+    if db is None:
+        _json_resort(resort_id)
+    else:
+        row = await db.get(ResortRow, resort_id)
+        if row is None:
+            raise HTTPException(status_code=404, detail="Resort not found")
     data = load_map_geojson(settings.seed_dir, resort_id)
     features = data.get("features", [])
     meta = data.get("metadata") or {"resort_id": resort_id}
@@ -57,30 +75,42 @@ async def get_resort_map(resort_id: str, db: DbDep) -> GeoJSONFeatureCollection:
 
 @router.get("/{resort_id}/trails")
 async def get_resort_trails(resort_id: str, db: DbDep) -> dict:
+    if db is None:
+        _json_resort(resort_id)
+        return {
+            "resort_id": resort_id,
+            "trails": [],
+            "lifts": [],
+            "total_trails": 0,
+            "total_lifts": 0,
+            "note": "Trails/lifts require Postgres when SKIMATE_DEV_JSON_API is unset.",
+        }
+
     row = await db.get(ResortRow, resort_id)
     if row is None:
         raise HTTPException(status_code=404, detail="Resort not found")
 
-    trail_result = await db.execute(
-        select(Trail).where(Trail.resort_id == resort_id)
-    )
-    lift_result = await db.execute(
-        select(Lift).where(Lift.resort_id == resort_id)
-    )
+    trail_result = await db.execute(select(Trail).where(Trail.resort_id == resort_id))
+    lift_result = await db.execute(select(Lift).where(Lift.resort_id == resort_id))
     trails = trail_result.scalars().all()
     lifts = lift_result.scalars().all()
 
     def trail_to_dict(t: Trail) -> dict:
         return {
-            "id": t.id, "name": t.name,
-            "piste_type": t.piste_type, "piste_difficulty": t.piste_difficulty,
-            "grooming": t.grooming, "oneway": t.oneway,
+            "id": t.id,
+            "name": t.name,
+            "piste_type": t.piste_type,
+            "piste_difficulty": t.piste_difficulty,
+            "grooming": t.grooming,
+            "oneway": t.oneway,
         }
 
     def lift_to_dict(l: Lift) -> dict:
         return {
-            "id": l.id, "name": l.name,
-            "aerialway_type": l.aerialway_type, "capacity": l.capacity,
+            "id": l.id,
+            "name": l.name,
+            "aerialway_type": l.aerialway_type,
+            "capacity": l.capacity,
         }
 
     return {

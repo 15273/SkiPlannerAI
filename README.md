@@ -22,10 +22,12 @@ cd services/api
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn skiplanner_api.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn skiplanner_api.main:app --reload --host 0.0.0.0 --port 8040
 ```
 
-Open `http://localhost:8000/docs` for OpenAPI.
+Or from repo root: `./scripts/run_api.sh` (default port **8040**; override: `API_PORT=9000 ./scripts/run_api.sh`).
+
+Open `http://localhost:8040/docs` for OpenAPI.
 
 ## Run the mobile app
 
@@ -35,7 +37,7 @@ npm install
 npx expo start
 ```
 
-Use a simulator or device. For a physical device, set `expo.extra.apiBaseUrl` in [apps/mobile/app.json](apps/mobile/app.json) to your machine LAN IP (e.g. `http://192.168.1.10:8000`).
+Use a simulator or device. For a physical device, set `expo.extra.apiBaseUrl` in [apps/mobile/app.json](apps/mobile/app.json) to your machine LAN IP (e.g. `http://192.168.1.10:8040`).
 
 ## GitHub milestones and issues
 

@@ -1,5 +1,6 @@
 import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useState } from 'react';
+import { DatePickerField } from '../components/DatePickerField';
 import { FlightOfferCard } from '../components/FlightOfferCard';
 import { Colors, Radius, Spacing, Typography } from '../constants/theme';
 import { useFlightSearch } from '../hooks/useFlightSearch';
@@ -14,12 +15,17 @@ const PREFER_OPTIONS: Array<{ value: FlightSearchRequest['prefer']; label: strin
 type Props = {
   defaultOrigin?: string;
   defaultDestination?: string;
+  defaultDepartureIso?: string;
 };
 
-export function FlightSearchScreen({ defaultOrigin = '', defaultDestination = '' }: Props) {
+export function FlightSearchScreen({
+  defaultOrigin = '',
+  defaultDestination = '',
+  defaultDepartureIso = '',
+}: Props) {
   const [origin, setOrigin] = useState(defaultOrigin);
   const [destination, setDestination] = useState(defaultDestination);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(defaultDepartureIso);
   const [prefer, setPrefer] = useState<FlightSearchRequest['prefer']>('balanced');
   const { result, loading, error, search } = useFlightSearch();
 
@@ -66,15 +72,10 @@ export function FlightSearchScreen({ defaultOrigin = '', defaultDestination = ''
       </View>
 
       <Text style={styles.label}>Departure date</Text>
-      <TextInput
-        style={styles.input}
-        value={date}
-        onChangeText={setDate}
-        placeholder="YYYY-MM-DD"
-        placeholderTextColor={Colors.textSecondary}
-        keyboardType="numbers-and-punctuation"
-        maxLength={10}
-        accessibilityLabel="Departure date"
+      <DatePickerField
+        valueIso={date.length > 0 ? date : null}
+        onChange={setDate}
+        placeholder="Pick departure date"
       />
 
       <Text style={[styles.label, { marginTop: Spacing.sm }]}>Sort by</Text>

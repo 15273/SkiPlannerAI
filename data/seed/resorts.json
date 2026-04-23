@@ -32,7 +32,7 @@
     "bounds": { "min_lat": 45.98, "max_lat": 46.06, "min_lon": 7.68, "max_lon": 7.82 },
     "source": "curated_seed",
     "source_version": "2026-04-01",
-    "nearest_airport_iata": "SIR",
+    "nearest_airport_iata": "GVA",
     "difficulty_hint": "intermediate"
   },
   {
