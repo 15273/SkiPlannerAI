@@ -35,8 +35,16 @@ def build_query(bounds: dict[str, float]) -> str:
 async def fetch_overpass(bounds: dict[str, float]) -> dict[str, Any]:
     query = build_query(bounds)
     logger.info("Fetching Overpass data for bounds %s", bounds)
+    headers = {
+        "User-Agent": "SkiPlannerAI/1.0 (educational project)",
+        "Accept": "application/json",
+    }
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        resp = await client.post(OVERPASS_URL, data={"data": query})
+        resp = await client.post(
+            OVERPASS_URL,
+            data={"data": query},
+            headers=headers,
+        )
         resp.raise_for_status()
     result = resp.json()
     logger.info("Overpass returned %d elements", len(result.get("elements", [])))
